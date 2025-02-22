@@ -1,6 +1,6 @@
 # CRUD приложение + логи через аспекты
 
-1. Создать простой RESTful сервис для управления задачами:
+### Создать простой RESTful сервис для управления задачами:
 
 Task(id, title, description,userId)
 
@@ -14,7 +14,7 @@ Task(id, title, description,userId)
 
 5. GET /tasks — получение списка всех задач.
 
-3. Релизуйте класс аспект, со следующими advice:
+### Реализовать класс аспект, со следующими advice:
 
 1. Before
 
@@ -23,3 +23,10 @@ Task(id, title, description,userId)
 3. AfterReturning
 
 4. Around (замер выполнения)
+
+# Запуск приложения:
+
+```
+mvn clean package
+docker-compose up --build
+```
