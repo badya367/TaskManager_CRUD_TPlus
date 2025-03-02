@@ -23,3 +23,11 @@ Task(id, title, description,userId)
 3. AfterReturning
 
 4. Around (замер выполнения)
+
+
+# Запуск приложения:
+
+```
+mvn clean package
+docker-compose up --build
+```

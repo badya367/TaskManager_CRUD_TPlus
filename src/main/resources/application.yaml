@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/t_plus_db
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: mypassword
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  docker:
+    # enabled = true - запуск через docker-compose, enabled = false для отладки
+    enabled: true
