@@ -3,13 +3,13 @@ package org.tplus.taskManager.taskManager_crud.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.tplus.taskManager.taskManager_crud.aspects.LogExecutionTime;
-import org.tplus.taskManager.taskManager_crud.model.Task;
+import org.tplus.taskManager.taskManager_crud.dto.TaskDto;
 import org.tplus.taskManager.taskManager_crud.services.TaskService;
 
 import java.util.List;
 
 /**
- * Контроллер для обработки HTTP-запросов, связанных с сущностью {@link Task}.
+ * Контроллер для обработки HTTP-запросов, связанных с сущностью {@link TaskDto}.
  *
  * <p>Этот контроллер предоставляет CRUD-операции для управления задачами.
  * Все методы логируются с использованием {@code SLF4J} и аннотации {@code @Slf4j}.
@@ -52,7 +52,7 @@ public class TaskController {
     @GetMapping
     @ResponseBody
     @LogExecutionTime
-    public List<Task> getAllTasks() {
+    public List<TaskDto> getAllTasks() {
         return taskService.getAllTasks();
     }
 
@@ -64,7 +64,7 @@ public class TaskController {
      */
     @GetMapping("/{id}")
     @LogExecutionTime
-    public Task getTaskById(@PathVariable Long id) {
+    public TaskDto getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id);
     }
 
@@ -76,7 +76,7 @@ public class TaskController {
      */
     @PostMapping
     @LogExecutionTime
-    public Task createTask(@RequestBody Task task) {
+    public TaskDto createTask(@RequestBody TaskDto task) {
         return taskService.createTask(task);
     }
 
@@ -89,7 +89,7 @@ public class TaskController {
      */
     @PutMapping("/{id}")
     @LogExecutionTime
-    public Task updateTask(@PathVariable Long id, @RequestBody Task task) {
+    public TaskDto updateTask(@PathVariable Long id, @RequestBody TaskDto task) {
         return taskService.updateTask(id, task);
     }
 

@@ -41,9 +41,9 @@ public class LoggingAspect {
      * <p>Этот аспект применяется ко всем методам в пакете {@code services}.
      * Логирование происходит перед выполнением целевого метода.</p>
      */
-    @Before("execution(* org.tplus.taskManager.taskManager_crud.services.*.*(..))")
+    @Before("execution(* org.tplus.taskManager.taskManager_crud.services.TaskService.*(..))")
     public void logBeforeMethodExecution(JoinPoint joinPoint) {
-        log.info("Before: Метод вызывается - {}", joinPoint.getSignature().toShortString() );
+        log.info("Before: Метод вызывается - {}", joinPoint.getSignature().toShortString());
     }
 
     /**
@@ -53,7 +53,7 @@ public class LoggingAspect {
      *
      * @param ex выброшенное исключение
      */
-    @AfterThrowing(pointcut = "execution(* org.tplus.taskManager.taskManager_crud.services.*.*(..))", throwing = "ex")
+    @AfterThrowing(pointcut = "execution(* org.tplus.taskManager.taskManager_crud.services.TaskService.*(..))", throwing = "ex")
     public void logAfterThrowing(Exception ex) {
         log.error("AfterThrowing: Метод выбросил исключение - {}", ex.getMessage());
     }
@@ -65,7 +65,7 @@ public class LoggingAspect {
      *
      * @param result результат выполнения метода
      */
-    @AfterReturning(pointcut = "execution(* org.tplus.taskManager.taskManager_crud.services.*.*(..))", returning = "result")
+    @AfterReturning(pointcut = "execution(* org.tplus.taskManager.taskManager_crud.services.TaskService.*(..))", returning = "result")
     public void logAfterReturning(Object result) {
         log.info("AfterReturning: Метод успешно завершился. Результат: {}", result);
     }
@@ -83,14 +83,20 @@ public class LoggingAspect {
     @Around("@annotation(org.tplus.taskManager.taskManager_crud.aspects.LogExecutionTime)")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
+        String methodName = joinPoint.getSignature().toShortString();
+        log.info("Вызов метода: {}", methodName);
 
-        log.info("Вызов метода: {}", joinPoint.getSignature().toShortString());
+        try {
+            Object result = joinPoint.proceed();
+            long executionTime = System.currentTimeMillis() - start;
 
-        Object result = joinPoint.proceed();  // Запускаем оригинальный метод
+            log.info("Метод {} выполнен за {} мс", joinPoint.getSignature().toShortString(), executionTime);
 
-        long executionTime = System.currentTimeMillis() - start;
-        log.info("Метод {} выполнен за {} мс", joinPoint.getSignature().toShortString(), executionTime);
+            return result;
+        } catch (Throwable ex) {
+            log.warn("Метод вызвал исключение, время работы метода: {} ms", System.currentTimeMillis() - start);
+            throw ex;
+        }
 
-        return result;
     }
 }

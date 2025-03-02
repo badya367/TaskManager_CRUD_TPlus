@@ -1,6 +1,7 @@
 package org.tplus.taskManager.taskManager_crud.services;
 
 import org.springframework.stereotype.Service;
+import org.tplus.taskManager.taskManager_crud.dto.TaskDto;
 import org.tplus.taskManager.taskManager_crud.model.Task;
 import org.tplus.taskManager.taskManager_crud.repository.TaskRepository;
 
@@ -40,8 +41,9 @@ public class TaskService {
      *
      * @return список задач
      */
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<TaskDto> getAllTasks() {
+
+        return taskRepository.findAll().stream().map(TaskService::toTaskDto).toList();
     }
 
     /**
@@ -51,8 +53,8 @@ public class TaskService {
      * @return найденная задача
      * @throws RuntimeException если задача не найдена
      */
-    public Task getTaskById(Long id) {
-        return taskRepository.findById(id)
+    public TaskDto getTaskById(Long id) {
+        return taskRepository.findById(id).map(TaskService::toTaskDto)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
     }
 
@@ -62,8 +64,13 @@ public class TaskService {
      * @param task объект задачи
      * @return сохраненная задача
      */
-    public Task createTask(Task task) {
-        return taskRepository.save(task);
+    public TaskDto createTask(TaskDto task) {
+
+        Task saveTask = taskRepository.save(toTask(task));
+
+        task.setId(saveTask.getId());
+
+        return task;
     }
 
     /**
@@ -74,17 +81,18 @@ public class TaskService {
      * @return обновленная задача
      * @throws RuntimeException если задача не найдена
      */
-    public Task updateTask(Long id, Task task) {
-        Optional<Task> existingTask = taskRepository.findById(id);
-        if (existingTask.isPresent()) {
-            Task updatedTask = existingTask.get();
-            updatedTask.setTitle(task.getTitle());
-            updatedTask.setDescription(task.getDescription());
-            updatedTask.setUserId(task.getUserId());
-            return taskRepository.save(updatedTask);
-        } else {
-            throw new RuntimeException("Task not found");
-        }
+    public TaskDto updateTask(Long id, TaskDto task) {
+        Optional<TaskDto> existingTask = Optional.of(getTaskById(id));
+
+        TaskDto updatedTask = existingTask.orElseThrow(
+                () -> new RuntimeException(String.format("Task with id %d not found", id)));
+        updatedTask.setTitle(task.getTitle());
+        updatedTask.setDescription(task.getDescription());
+        updatedTask.setUserId(task.getUserId());
+
+        taskRepository.save(toTask(task));
+
+        return updatedTask;
     }
 
     /**
@@ -98,5 +106,23 @@ public class TaskService {
             throw new RuntimeException("Task not found");
         }
         taskRepository.deleteById(id);
+    }
+
+    private static TaskDto toTaskDto(Task task) {
+        return  new TaskDto(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getUserId()
+        );
+    }
+
+    private static Task toTask(TaskDto taskDto) {
+        return new Task(
+                taskDto.getId(),
+                taskDto.getTitle(),
+                taskDto.getDescription(),
+                taskDto.getUserId()
+        );
     }
 }
