@@ -57,4 +57,8 @@ public class Task {
      * Используется для связи задачи с конкретным пользователем.
      */
     private Long userId;
+    /**
+     * статус задачи
+     */
+    private String status;
 }

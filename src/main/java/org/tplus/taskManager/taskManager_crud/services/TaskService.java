@@ -1,12 +1,18 @@
 package org.tplus.taskManager.taskManager_crud.services;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tplus.taskManager.taskManager_crud.dto.TaskDto;
+import org.tplus.taskManager.taskManager_crud.kafka.KafkaClientProducer;
+import org.tplus.taskManager.taskManager_crud.mapper.TaskMapper;
 import org.tplus.taskManager.taskManager_crud.model.Task;
 import org.tplus.taskManager.taskManager_crud.repository.TaskRepository;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Сервисный класс для управления задачами {@link Task}.
@@ -20,21 +26,23 @@ import java.util.Optional;
  * @version 1.0
  * @since 2025-02-22
  */
+@RequiredArgsConstructor
 @Service
+@Slf4j
 public class TaskService {
     /**
      * Репозиторий для работы с задачами в базе данных.
      */
     private final TaskRepository taskRepository;
-
     /**
-     * Конструктор для внедрения зависимости {@link TaskRepository}.
-     *
-     * @param taskRepository репозиторий задач
+     * Kafka-продюсер для отправки событий об обновлении статуса задачи.
      */
-    public TaskService(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
-    }
+    private final KafkaClientProducer kafkaClientProducer;
+    /**
+     * Название Kafka-топика для событий об обновлении статуса задачи.
+     */
+    @Value("t_plus_tasks_update_status")
+    private String updateTopic;
 
     /**
      * Получает список всех задач.
@@ -43,7 +51,7 @@ public class TaskService {
      */
     public List<TaskDto> getAllTasks() {
 
-        return taskRepository.findAll().stream().map(TaskService::toTaskDto).toList();
+        return taskRepository.findAll().stream().map(TaskMapper::toTaskDto).toList();
     }
 
     /**
@@ -54,8 +62,8 @@ public class TaskService {
      * @throws RuntimeException если задача не найдена
      */
     public TaskDto getTaskById(Long id) {
-        return taskRepository.findById(id).map(TaskService::toTaskDto)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+        return taskRepository.findById(id).map(TaskMapper::toTaskDto)
+                .orElseThrow(() -> new NoSuchElementException("Task not found"));
     }
 
     /**
@@ -66,7 +74,7 @@ public class TaskService {
      */
     public TaskDto createTask(TaskDto task) {
 
-        Task saveTask = taskRepository.save(toTask(task));
+        Task saveTask = taskRepository.save(TaskMapper.toTask(task));
 
         task.setId(saveTask.getId());
 
@@ -74,25 +82,37 @@ public class TaskService {
     }
 
     /**
-     * Обновляет существующую задачу по ее идентификатору.
+     * Обновляет существующую задачу по идентификатору.
+     * <p>
+     * Если статус задачи изменился, сервис отправляет событие в Kafka.
+     * </p>
      *
      * @param id   идентификатор задачи
-     * @param task данные для обновления
-     * @return обновленная задача
-     * @throws RuntimeException если задача не найдена
+     * @param task данные для обновления задачи
+     * @return обновленная задача в виде DTO
+     * @throws NoSuchElementException если задача не найдена
      */
     public TaskDto updateTask(Long id, TaskDto task) {
-        Optional<TaskDto> existingTask = Optional.of(getTaskById(id));
+        TaskDto existingTask = getTaskById(id);
 
-        TaskDto updatedTask = existingTask.orElseThrow(
-                () -> new RuntimeException(String.format("Task with id %d not found", id)));
-        updatedTask.setTitle(task.getTitle());
-        updatedTask.setDescription(task.getDescription());
-        updatedTask.setUserId(task.getUserId());
+        existingTask.setTitle(task.getTitle());
+        existingTask.setDescription(task.getDescription());
+        existingTask.setUserId(task.getUserId());
 
-        taskRepository.save(toTask(task));
+        boolean statusChanged = !Objects.equals(existingTask.getStatus(), task.getStatus());
+        existingTask.setStatus(task.getStatus());
 
-        return updatedTask;
+        taskRepository.save(TaskMapper.toTask(existingTask));
+
+        if (statusChanged) {
+            try {
+                kafkaClientProducer.sendTo(updateTopic, TaskMapper.toStatusUpdateDto(TaskMapper.toTask(existingTask)));
+            } catch (Exception e) {
+                log.error("Не удалось отправить событие в Kafka для таски с id={}: {}", id, e.getMessage(), e);
+            }
+        }
+
+        return existingTask;
     }
 
     /**
@@ -108,21 +128,4 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    private static TaskDto toTaskDto(Task task) {
-        return  new TaskDto(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getUserId()
-        );
-    }
-
-    private static Task toTask(TaskDto taskDto) {
-        return new Task(
-                taskDto.getId(),
-                taskDto.getTitle(),
-                taskDto.getDescription(),
-                taskDto.getUserId()
-        );
-    }
 }
