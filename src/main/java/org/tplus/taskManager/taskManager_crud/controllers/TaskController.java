@@ -1,12 +1,11 @@
 package org.tplus.taskManager.taskManager_crud.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.tplus.taskManager.taskManager_crud.aspects.LogExecutionTime;
+import org.tplus.logStarter.my_LogStarter.aspects.annotations.LogExecution;
+import org.tplus.logStarter.my_LogStarter.aspects.annotations.LogExecutionHttp;
+import org.tplus.logStarter.my_LogStarter.aspects.annotations.LogExecutionTime;
 import org.tplus.taskManager.taskManager_crud.dto.TaskDto;
-import org.tplus.taskManager.taskManager_crud.dto.TaskStatusUpdateDto;
-import org.tplus.taskManager.taskManager_crud.kafka.KafkaClientProducer;
 import org.tplus.taskManager.taskManager_crud.services.TaskService;
 
 import java.util.List;
@@ -54,7 +53,9 @@ public class TaskController {
      */
     @GetMapping
     @ResponseBody
+    @LogExecution
     @LogExecutionTime
+    @LogExecutionHttp
     public List<TaskDto> getAllTasks() {
         return taskService.getAllTasks();
     }
@@ -66,7 +67,9 @@ public class TaskController {
      * @return найденная задача
      */
     @GetMapping("/{id}")
+    @LogExecution
     @LogExecutionTime
+    @LogExecutionHttp
     public TaskDto getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id);
     }
@@ -78,7 +81,9 @@ public class TaskController {
      * @return созданная задача
      */
     @PostMapping
+    @LogExecution
     @LogExecutionTime
+    @LogExecutionHttp
     public TaskDto createTask(@RequestBody TaskDto task) {
         return taskService.createTask(task);
     }
@@ -91,16 +96,21 @@ public class TaskController {
      * @return обновленная задача
      */
     @PutMapping("/{id}")
+    @LogExecution
     @LogExecutionTime
+    @LogExecutionHttp
     public TaskDto updateTask(@PathVariable Long id, @RequestBody TaskDto task) {
         return taskService.updateTask(id, task);
     }
+
     /**
      * Удаляет задачу по ее идентификатору.
      *
      * @param id идентификатор задачи
      */
     @DeleteMapping("/{id}")
+    @LogExecution
+    @LogExecutionHttp
     public void deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
     }
