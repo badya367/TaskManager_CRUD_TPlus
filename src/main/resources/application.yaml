@@ -11,4 +11,24 @@ spring:
     show-sql: true
   docker:
     # enabled = true - запуск через docker-compose, enabled = false для отладки
-    enabled: true
+    enabled: false
+  mail:
+    host: smtp.yandex.ru
+    port: 465
+    username: dmitriybadikov367@yandex.ru
+    password: frqjskhzzhayoskm
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.ssl.enable: true
+
+t_plus_tasks_name: t_plus_tasks
+t_plus_tasks:
+  default_topic: t_plus_tasks_default_topic
+  kafka:
+    localhost: localhost:9092
+
+task-notification:
+  mail:
+    recipient: badikov_dima@mail.ru
+    subject: Обновление Task!

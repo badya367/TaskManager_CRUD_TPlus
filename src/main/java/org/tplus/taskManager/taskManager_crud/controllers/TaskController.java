@@ -1,9 +1,12 @@
 package org.tplus.taskManager.taskManager_crud.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tplus.taskManager.taskManager_crud.aspects.LogExecutionTime;
 import org.tplus.taskManager.taskManager_crud.dto.TaskDto;
+import org.tplus.taskManager.taskManager_crud.dto.TaskStatusUpdateDto;
+import org.tplus.taskManager.taskManager_crud.kafka.KafkaClientProducer;
 import org.tplus.taskManager.taskManager_crud.services.TaskService;
 
 import java.util.List;
@@ -92,7 +95,6 @@ public class TaskController {
     public TaskDto updateTask(@PathVariable Long id, @RequestBody TaskDto task) {
         return taskService.updateTask(id, task);
     }
-
     /**
      * Удаляет задачу по ее идентификатору.
      *

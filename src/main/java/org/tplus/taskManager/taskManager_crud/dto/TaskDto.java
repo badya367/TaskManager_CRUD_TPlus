@@ -1,8 +1,5 @@
 package org.tplus.taskManager.taskManager_crud.dto;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,4 +30,9 @@ public class TaskDto {
      * Используется для связи задачи с конкретным пользователем.
      */
     private Long userId;
+    /**
+     * Статус задачи
+     */
+    private TaskStatus status;
+
 }
