@@ -11,7 +11,7 @@ spring:
     show-sql: true
   docker:
     # enabled = true - запуск через docker-compose, enabled = false для отладки
-    enabled: true
+    enabled: false
   mail:
     host: smtp.yandex.ru
     port: 465

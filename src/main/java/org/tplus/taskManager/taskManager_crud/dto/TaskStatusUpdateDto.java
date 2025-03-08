@@ -30,5 +30,5 @@ public class TaskStatusUpdateDto {
     /**
      * Новый статус задачи.
      */
-    private String status;
+    private TaskStatus status;
 }

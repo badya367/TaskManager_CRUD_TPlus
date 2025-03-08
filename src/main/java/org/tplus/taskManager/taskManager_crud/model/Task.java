@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.tplus.taskManager.taskManager_crud.dto.TaskStatus;
 
 /**
  * Класс {@code Task} представляет собой сущность задачи, используемую в системе управления задачами.
@@ -60,5 +61,6 @@ public class Task {
     /**
      * статус задачи
      */
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
 }

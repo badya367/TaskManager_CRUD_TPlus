@@ -33,6 +33,6 @@ public class TaskDto {
     /**
      * Статус задачи
      */
-    private String status;
+    private TaskStatus status;
 
 }

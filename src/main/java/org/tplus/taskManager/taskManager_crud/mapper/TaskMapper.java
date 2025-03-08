@@ -1,5 +1,6 @@
 package org.tplus.taskManager.taskManager_crud.mapper;
 
+import org.springframework.stereotype.Component;
 import org.tplus.taskManager.taskManager_crud.dto.TaskDto;
 import org.tplus.taskManager.taskManager_crud.dto.TaskStatusUpdateDto;
 import org.tplus.taskManager.taskManager_crud.model.Task;
@@ -14,6 +15,7 @@ import org.tplus.taskManager.taskManager_crud.model.Task;
  * @version 1.0
  * @since 2025-03-02
  */
+@Component
 public class TaskMapper {
     /**
      * Преобразует сущность {@link Task} в {@link TaskDto}.
@@ -21,7 +23,7 @@ public class TaskMapper {
      * @param task сущность задачи
      * @return DTO задачи
      */
-    public static TaskDto toTaskDto(Task task) {
+    public TaskDto toTaskDto(Task task) {
         return new TaskDto(
                 task.getId(),
                 task.getTitle(),
@@ -37,7 +39,7 @@ public class TaskMapper {
      * @param taskDto DTO задачи
      * @return сущность задачи
      */
-    public static Task toTask(TaskDto taskDto) {
+    public Task toTask(TaskDto taskDto) {
         return new Task(
                 taskDto.getId(),
                 taskDto.getTitle(),
@@ -56,7 +58,7 @@ public class TaskMapper {
      * @param task сущность задачи
      * @return DTO обновления статуса задачи
      */
-    public static TaskStatusUpdateDto toStatusUpdateDto(Task task) {
+    public TaskStatusUpdateDto toStatusUpdateDto(Task task) {
         return TaskStatusUpdateDto.builder()
                 .id(task.getId())
                 .status(task.getStatus())

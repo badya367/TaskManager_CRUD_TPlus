@@ -171,7 +171,7 @@ public class KafkaConfig {
      * @param <T>             тип сообщений
      * @return KafkaTemplate для отправки
      */
-    @Bean("client")
+    @Bean("taskStatusKafkaTemplate")
     public <T> KafkaTemplate<String, T> kafkaTemplate(@Qualifier("producerClientFactory") ProducerFactory<String, T> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
@@ -184,7 +184,7 @@ public class KafkaConfig {
      */
     @Bean
     @ConditionalOnProperty(value = "t1.kafka.producer.enable", havingValue = "true", matchIfMissing = true)
-    public KafkaClientProducer producerClient(@Qualifier("client") KafkaTemplate<String, TaskStatusUpdateDto> template) {
+    public KafkaClientProducer producerClient(@Qualifier("taskStatusKafkaTemplate") KafkaTemplate<String, TaskStatusUpdateDto> template) {
         template.setDefaultTopic(clientTopic);
         return new KafkaClientProducer(template);
     }

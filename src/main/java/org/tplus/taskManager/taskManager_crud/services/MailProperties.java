@@ -2,7 +2,6 @@ package org.tplus.taskManager.taskManager_crud.services;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * Конфигурационные свойства для email-уведомлений о задачах.
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
  * Этот класс позволяет загружать параметры из application.yml или application.properties
  * с префиксом {@code task-notification.mail}.
  * </p>
- *
+ * <p>
  * Пример конфигурации в application.yml:
  * <pre>
  * task-notification:
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Component;
  * @since 2025-03-02
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "task-notification.mail")
 public class MailProperties {
 

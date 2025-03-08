@@ -35,6 +35,10 @@ public class TaskService {
      */
     private final TaskRepository taskRepository;
     /**
+     * Маппер для преобразования сущностей Task
+     */
+    private final TaskMapper taskMapper;
+    /**
      * Kafka-продюсер для отправки событий об обновлении статуса задачи.
      */
     private final KafkaClientProducer kafkaClientProducer;
@@ -51,7 +55,9 @@ public class TaskService {
      */
     public List<TaskDto> getAllTasks() {
 
-        return taskRepository.findAll().stream().map(TaskMapper::toTaskDto).toList();
+        return taskRepository.findAll().stream()
+                .map(task -> taskMapper.toTaskDto(task))
+                .toList();
     }
 
     /**
@@ -62,7 +68,7 @@ public class TaskService {
      * @throws RuntimeException если задача не найдена
      */
     public TaskDto getTaskById(Long id) {
-        return taskRepository.findById(id).map(TaskMapper::toTaskDto)
+        return taskRepository.findById(id).map(task -> taskMapper.toTaskDto(task))
                 .orElseThrow(() -> new NoSuchElementException("Task not found"));
     }
 
@@ -74,7 +80,7 @@ public class TaskService {
      */
     public TaskDto createTask(TaskDto task) {
 
-        Task saveTask = taskRepository.save(TaskMapper.toTask(task));
+        Task saveTask = taskRepository.save(taskMapper.toTask(task));
 
         task.setId(saveTask.getId());
 
@@ -102,11 +108,11 @@ public class TaskService {
         boolean statusChanged = !Objects.equals(existingTask.getStatus(), task.getStatus());
         existingTask.setStatus(task.getStatus());
 
-        taskRepository.save(TaskMapper.toTask(existingTask));
+        taskRepository.save(taskMapper.toTask(existingTask));
 
         if (statusChanged) {
             try {
-                kafkaClientProducer.sendTo(updateTopic, TaskMapper.toStatusUpdateDto(TaskMapper.toTask(existingTask)));
+                kafkaClientProducer.sendTo(updateTopic, taskMapper.toStatusUpdateDto(taskMapper.toTask(existingTask)));
             } catch (Exception e) {
                 log.error("Не удалось отправить событие в Kafka для таски с id={}: {}", id, e.getMessage(), e);
             }
