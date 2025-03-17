@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 import org.tplus.taskManager.taskManager_crud.dto.TaskStatus;
+
+import java.util.Objects;
 
 /**
  * Класс {@code Task} представляет собой сущность задачи, используемую в системе управления задачами.
@@ -47,6 +50,7 @@ public class Task {
      * Название задачи.
      * Определяет краткое описание задачи.
      */
+    @Column(nullable = false)
     private String title;
     /**
      * Подробное описание задачи.
@@ -59,8 +63,28 @@ public class Task {
      */
     private Long userId;
     /**
-     * статус задачи
+     * Статус задачи
      */
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Task task = (Task) o;
+        return getId() != null && Objects.equals(getId(), task.getId())
+                && Objects.equals(getTitle(), task.getTitle())
+                && Objects.equals(getDescription(), task.getDescription())
+                && Objects.equals(getUserId(), task.getUserId())
+                && Objects.equals(getStatus(), task.getStatus());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

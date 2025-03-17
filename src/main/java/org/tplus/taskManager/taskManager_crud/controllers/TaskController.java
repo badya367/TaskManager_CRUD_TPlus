@@ -1,5 +1,6 @@
 package org.tplus.taskManager.taskManager_crud.controllers;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.tplus.logStarter.my_LogStarter.aspects.annotations.LogExecution;
@@ -84,9 +85,7 @@ public class TaskController {
     @LogExecution
     @LogExecutionTime
     @LogExecutionHttp
-    public TaskDto createTask(@RequestBody TaskDto task) {
-        return taskService.createTask(task);
-    }
+    public TaskDto createTask(@Valid @RequestBody TaskDto task) {return taskService.createTask(task);}
 
     /**
      * Обновляет существующую задачу по ее идентификатору.
