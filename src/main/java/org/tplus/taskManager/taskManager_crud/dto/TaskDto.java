@@ -1,5 +1,6 @@
 package org.tplus.taskManager.taskManager_crud.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class TaskDto {
      * Название задачи.
      * Определяет краткое описание задачи.
      */
+    @NotBlank(message = "Название не может быть пустым")
     private String title;
     /**
      * Подробное описание задачи.

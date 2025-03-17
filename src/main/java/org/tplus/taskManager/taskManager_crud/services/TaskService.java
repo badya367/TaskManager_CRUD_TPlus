@@ -1,5 +1,6 @@
 package org.tplus.taskManager.taskManager_crud.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +57,7 @@ public class TaskService {
     public List<TaskDto> getAllTasks() {
 
         return taskRepository.findAll().stream()
-                .map(task -> taskMapper.toTaskDto(task))
+                .map(taskMapper::toTaskDto)
                 .toList();
     }
 
@@ -68,8 +69,8 @@ public class TaskService {
      * @throws RuntimeException если задача не найдена
      */
     public TaskDto getTaskById(Long id) {
-        return taskRepository.findById(id).map(task -> taskMapper.toTaskDto(task))
-                .orElseThrow(() -> new NoSuchElementException("Task not found"));
+        return taskRepository.findById(id).map(taskMapper::toTaskDto)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
     }
 
     /**
@@ -81,10 +82,7 @@ public class TaskService {
     public TaskDto createTask(TaskDto task) {
 
         Task saveTask = taskRepository.save(taskMapper.toTask(task));
-
-        task.setId(saveTask.getId());
-
-        return task;
+        return taskMapper.toTaskDto(saveTask);
     }
 
     /**
@@ -129,7 +127,7 @@ public class TaskService {
      */
     public void deleteTask(Long id) {
         if (!taskRepository.existsById(id)) {
-            throw new RuntimeException("Task not found");
+            throw new EntityNotFoundException("Task not found");
         }
         taskRepository.deleteById(id);
     }
