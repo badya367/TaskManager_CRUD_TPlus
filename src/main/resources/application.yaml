@@ -32,3 +32,13 @@ task-notification:
   mail:
     recipient: badikov_dima@mail.ru
     subject: Обновление Task!
+
+logging:
+  settings:
+    enabled: true
+    fillter-level: info
+    log-level: info
+  settings-http:
+    enabled: true
+    fillter-level: info
+    log-level: info

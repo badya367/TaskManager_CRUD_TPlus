@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.tplus.logStarter.my_LogStarter.aspects.annotations.LogExecution;
 import org.tplus.taskManager.taskManager_crud.dto.TaskStatusUpdateDto;
 
 /**
@@ -45,6 +46,7 @@ public class NotificationService {
      *
      * @param taskDto данные о задаче и её новом статусе
      */
+    @LogExecution
     public void taskUpdateNotification(TaskStatusUpdateDto taskDto) {
         log.info("Task с id: {}, обновил статус: {}", taskDto.getId(), taskDto.getStatus());
         sendEmail(taskDto);
